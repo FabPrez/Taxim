@@ -348,9 +348,9 @@ if __name__ == "__main__":
     heightMap, contact_mask, contact_height = sim.deformApprox(press_depth, height_map, gel_map, contact_mask)
     # simulate tactile images
     sim_img, shadow_sim_img = sim.simulating(heightMap, contact_mask, contact_height, shadow=True)
-    img_savePath = osp.join('..', 'results', obj[:-4]+'_sim.jpg')
-    shadow_savePath = osp.join('..', 'results', obj[:-4]+'_shadow.jpg')
-    height_savePath = osp.join('..', 'results', obj[:-4]+'_height.npy')
+    img_savePath = osp.join('..', 'results', obj[:-4]+'_gsmini_sim.jpg')
+    shadow_savePath = osp.join('..', 'results', obj[:-4]+'_gsmini_shadow.jpg')
+    height_savePath = osp.join('..', 'results', obj[:-4]+'_gsmini_height.npy')
     cv2.imwrite(img_savePath, sim_img)
     cv2.imwrite(shadow_savePath, shadow_sim_img)
     np.save(height_savePath, heightMap)
