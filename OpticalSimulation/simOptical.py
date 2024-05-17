@@ -331,9 +331,9 @@ class simulator(object):
         return np.pad(img, ((1, 1), (1, 1)), 'symmetric')
 
 if __name__ == "__main__":
-    data_folder = osp.join(osp.join( "..", "calibs"))
+    data_folder = osp.join(osp.join( "..", "calibs",)) 
     filePath = osp.join('..', 'data', 'objects')
-    gelpad_model_path = osp.join( '..', 'calibs', 'gelmap5.npy')
+    gelpad_model_path = osp.join( '..', 'calibs', 'gelmap5.npy') 
     obj = args.obj + '.ply'
     sim = simulator(data_folder, filePath, obj)
     press_depth = args.depth
