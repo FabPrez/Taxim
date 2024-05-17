@@ -1,5 +1,8 @@
 # Taxim - GSMINI
 Taxim is an example-based simulator for GelSight tactile sensors and its variations. For more information of Taxim, you can check the [paper](https://arxiv.org/abs/2109.04027) or the [webpage](https://labs.ri.cmu.edu/robotouch/taxim-simulation/).
+Video resources:
+ - [Taxim tutorial](https://www.youtube.com/watch?v=iO5HR2vWkmY)
+ - [Example](https://www.youtube.com/watch?v=6pkGKZD0rRA)
 
 This repository has added calibration files for the **GelSight-mini**, which are used only by `OpticalSimulation_gsmini.py`.
 An additional file named `sensorParams_gsmini.py` has been added. This file is NOT used in `MarkerMotionSimulation` but is only for generating the standard tactile image.
