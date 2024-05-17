@@ -1,6 +1,19 @@
 # Taxim: An Example-based Simulation Model for GelSight Tactile Sensors
 Taxim is an example-based simulator for GelSight tactile sensors and its variations. For more information of Taxim, you can check the [paper](https://arxiv.org/abs/2109.04027) or the [webpage](https://labs.ri.cmu.edu/robotouch/taxim-simulation/).
 
+## Setting up Your Environment
+```bash
+mkidr taxim_project
+git clone https://github.com/FabPrez/Taxim.git
+```
+Create the virtual environment and install the requirements
+```bash
+python3 -m venv taxim_venv
+source taxim_venv/bin/activate
+cd Taxim/
+pip install -r requirements.txt
+```
+
 ## Installation and Prerequisites
 Basic dependencies: numpy, scipy, matplotlib, cv2
 
