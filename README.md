@@ -14,10 +14,8 @@ cd Taxim/
 pip install -r requirements.txt
 ```
 
-## Installation and Prerequisites
+## Prerequisites
 Basic dependencies: numpy, scipy, matplotlib, cv2
-
-To install dependencies: `pip install -r requirements.txt`
 
 Optional dependencies: ros with usb-cam driver (to collect the tactile images from a tactile sensor), nanogui (to annotate the raw data.)
 
