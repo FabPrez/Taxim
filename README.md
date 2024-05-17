@@ -47,7 +47,14 @@ We provide a set of calibration files and you can work with them directly. You c
 
 All the calibration files from a GelSight sensor have been provided under `calibs` folder.
 
-## Optical Simulation
+--- 
+## Optical Simulation - Gsmini sensor
+You can input a point cloud of a certain object model and define the pressing depth, or directly input a depth map. All the parameters in `Basic.params` are adjustable. `depth` is in millimeter unit.
+
+Run `python simOptical_gsmini.py -obj square -depth 1.0` to visualize the examples. Results are saved under `results` and have '._gsmini'.
+
+
+## Optical Simulation - standard sensor
 You can input a point cloud of a certain object model and define the pressing depth, or directly input a depth map. All the parameters in `Basic.params` are adjustable. `depth` is in millimeter unit.
 
 Run `python simOptical.py -obj square -depth 1.0` to visualize the examples. Results are saved under `results`.
