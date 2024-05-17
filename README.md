@@ -1,5 +1,11 @@
-# Taxim: An Example-based Simulation Model for GelSight Tactile Sensors
+# Taxim - GSMINI
 Taxim is an example-based simulator for GelSight tactile sensors and its variations. For more information of Taxim, you can check the [paper](https://arxiv.org/abs/2109.04027) or the [webpage](https://labs.ri.cmu.edu/robotouch/taxim-simulation/).
+Video resources:
+ - [Taxim tutorial](https://www.youtube.com/watch?v=iO5HR2vWkmY)
+ - [Example](https://www.youtube.com/watch?v=6pkGKZD0rRA)
+
+This repository has added calibration files for the **GelSight-mini**, which are used only by `OpticalSimulation_gsmini.py`.
+An additional file named `sensorParams_gsmini.py` has been added. This file is NOT used in `MarkerMotionSimulation` but is only for generating the standard tactile image.
 
 ## Setting up Your Environment
 ```bash
@@ -41,7 +47,14 @@ We provide a set of calibration files and you can work with them directly. You c
 
 All the calibration files from a GelSight sensor have been provided under `calibs` folder.
 
-## Optical Simulation
+--- 
+## Optical Simulation - Gsmini sensor
+You can input a point cloud of a certain object model and define the pressing depth, or directly input a depth map. All the parameters in `Basic.params` are adjustable. `depth` is in millimeter unit.
+
+Run `python simOptical_gsmini.py -obj square -depth 1.0` to visualize the examples. Results are saved under `results` and have '._gsmini'.
+
+
+## Optical Simulation - standard sensor
 You can input a point cloud of a certain object model and define the pressing depth, or directly input a depth map. All the parameters in `Basic.params` are adjustable. `depth` is in millimeter unit.
 
 Run `python simOptical.py -obj square -depth 1.0` to visualize the examples. Results are saved under `results`.
