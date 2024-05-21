@@ -9,32 +9,36 @@ import cv2
 import argparse
 
 import sys
-sys.path.append("..")
+sys.path.append(osp.abspath(osp.join(osp.dirname(__file__),'..')))
+print('path from Taxim is ------: ',sys.path)
 from Basics.RawData import RawData
 from Basics.CalibData import CalibData
 import Basics.params as pr
 import Basics.sensorParams_gsmini as psp
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-obj", nargs='?', default='square',
-                    help="Name of Object to be tested, supported_objects_list = [square, cylinder6]")
-parser.add_argument('-depth', default = 1.0, type=float, help='Indetation depth into the gelpad.')
-args = parser.parse_args()
+
 
 class simulator(object):
-    def __init__(self, data_folder, filePath, obj):
+    def __init__(self, obj_filePath):
         """
         Initialize the simulator.
         1) load the object,
         2) load the calibration files,
         3) generate shadow table from shadow masks
         """
-        # read in object's ply file
-        # object facing positive direction of z axis
-        objPath = osp.join(filePath,obj)
-        self.obj_name = obj.split('.')[0]
-        print("load object: " + self.obj_name)
-        f = open(objPath)
+        abs_path = osp.abspath(osp.join(osp.dirname(__file__),'..'))
+        data_folder = osp.join(osp.join( abs_path, "calibs","gelsight_mini"))
+        self.gelpad_model_path = osp.join(abs_path,"calibs",'gelmap_gsmini.npy')
+        # data_folder =osp.join(osp.abspath(osp.join(osp.dirname(__file__))), "calibs","gelsight_mini")
+        
+        # # read in object's ply file
+        # # object facing positive direction of z axis
+        # objPath = osp.join(filePath,obj)
+        # self.obj_name = obj.split('.')[0]
+        # print("load object: " + self.obj_name)
+        # f = open(objPath)
+        
+        f = open(obj_filePath)
         lines = f.readlines()
         self.verts_num = int(lines[3].split(' ')[-1])
         verts_lines = lines[10:10 + self.verts_num]
@@ -217,7 +221,7 @@ class simulator(object):
         shadow_sim_img = cv2.GaussianBlur(shadow_sim_img.astype(np.float32),(pr.kernel_size,pr.kernel_size),0)
         return sim_img, shadow_sim_img
 
-    def generateHeightMap(self, gelpad_model_path, pressing_height_mm, dx, dy):
+    def generateHeightMap(self, pressing_height_mm, dx, dy):
         """
         Generate the height map by interacting the object with the gelpad model.
         pressing_height_mm: pressing depth in millimeter
@@ -227,9 +231,10 @@ class simulator(object):
         gel_map: gelpad height map
         contact_mask: indicate contact area
         """
+        # gelpad_model_path = osp.join( '..', 'calibs', 'gelmap_gsmini.npy')
         assert(self.vertices.shape[1] == 3)
         # load dome-shape gelpad model
-        gel_map = np.load(gelpad_model_path)
+        gel_map = np.load(self.gelpad_model_path)
         gel_map = cv2.GaussianBlur(gel_map.astype(np.float32),(pr.kernel_size,pr.kernel_size),0)
         heightMap = np.zeros((psp.h,psp.w))
 
@@ -329,21 +334,35 @@ class simulator(object):
     def padding(self,img):
         """ pad one row & one col on each side """
         return np.pad(img, ((1, 1), (1, 1)), 'symmetric')
+    
+    
+    def generateSimulatedImages(self, press_depth, dx, dy):
+        # generate height map
+        height_map, gel_map, contact_mask = self.generateHeightMap(press_depth, dx, dy)
+        # approximate the soft deformation
+        heightMap, contact_mask, contact_height = self.deformApprox(press_depth, height_map, gel_map, contact_mask)
+        # simulate tactile images
+        sim_img, shadow_sim_img = self.simulating(heightMap, contact_mask, contact_height, shadow=True)
+        return sim_img, shadow_sim_img, heightMap
 
 if __name__ == "__main__":
-    data_folder = osp.join(osp.join( "..", "calibs","gelsight_mini")) # FABIO: modified for gsmini added only "gelsigth_mini" in the path
-    # data_folder = osp.join(osp.join( "..", "calibs",)) 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-obj", nargs='?', default='square',
+                    help="Name of Object to be tested, supported_objects_list = [square, cylinder6]")
+    parser.add_argument('-depth', default = 1.0, type=float, help='Indetation depth into the gelpad.')
+    args = parser.parse_args()
+    
+    # data_folder = osp.join(osp.join( "..", "calibs","gelsight_mini")) # FABIO: modified for gsmini added only "gelsigth_mini" in the path
     filePath = osp.join('..', 'data', 'objects')
-    gelpad_model_path = osp.join( '..', 'calibs', 'gelmap_gsmini.npy') # FABIO: modifed taking gelmap_gsmini and no more gelmap5
-    # gelpad_model_path = osp.join( '..', 'calibs', 'gelmap5.npy') 
+    # gelpad_model_path = osp.join( '..', 'calibs', 'gelmap_gsmini.npy') # FABIO: modifed taking gelmap_gsmini and no more gelmap5
     obj = args.obj + '.ply'
-    sim = simulator(data_folder, filePath, obj)
+    sim = simulator(obj_filePath=osp.join(filePath, obj))
     press_depth = args.depth
     dx = 0
     dy = 0
 
     # generate height map
-    height_map, gel_map, contact_mask = sim.generateHeightMap(gelpad_model_path, press_depth, dx, dy)
+    height_map, gel_map, contact_mask = sim.generateHeightMap(press_depth, dx, dy)
     # approximate the soft deformation
     heightMap, contact_mask, contact_height = sim.deformApprox(press_depth, height_map, gel_map, contact_mask)
     # simulate tactile images
