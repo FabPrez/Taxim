@@ -233,9 +233,11 @@ class simulator(object):
         gel_map = cv2.GaussianBlur(gel_map.astype(np.float32),(pr.kernel_size,pr.kernel_size),0)
         heightMap = np.zeros((psp.h,psp.w))
 
-        # centralize the points
-        cx = np.mean(self.vertices[:,0])
-        cy = np.mean(self.vertices[:,1])
+        # # centralize the points
+        # cx = np.mean(self.vertices[:,0])
+        # cy = np.mean(self.vertices[:,1])
+        cx = 0
+        cy = 0
         # add the shifting and change to the pix coordinate
         uu = ((self.vertices[:,0] - cx)/psp.pixmm + psp.w//2+dx).astype(int)
         vv = ((self.vertices[:,1] - cy)/psp.pixmm + psp.h//2+dy).astype(int)
