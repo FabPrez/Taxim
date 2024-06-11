@@ -19,7 +19,8 @@ import Basics.sensorParams_gsmini as psp
 
 
 class simulator(object):
-    def __init__(self, obj_filePath):
+    def __init__(self, vertices):
+        # def __init__(self, obj_filePath,vertices):
         """
         Initialize the simulator.
         1) load the object,
@@ -38,11 +39,12 @@ class simulator(object):
         # print("load object: " + self.obj_name)
         # f = open(objPath)
         
-        f = open(obj_filePath)
-        lines = f.readlines()
-        self.verts_num = int(lines[3].split(' ')[-1])
-        verts_lines = lines[10:10 + self.verts_num]
-        self.vertices = np.array([list(map(float, l.strip().split(' '))) for l in verts_lines])
+        # f = open(obj_filePath)
+        # lines = f.readlines()
+        # self.verts_num = int(lines[3].split(' ')[-1])
+        # verts_lines = lines[10:10 + self.verts_num]
+        # self.vertices = np.array([list(map(float, l.strip().split(' '))) for l in verts_lines])
+        self.vertices = vertices
 
         # polytable
         calib_data = osp.join(data_folder, "polycalib.npz")
