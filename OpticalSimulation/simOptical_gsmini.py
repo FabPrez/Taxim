@@ -19,7 +19,7 @@ import Basics.sensorParams_gsmini as psp
 
 
 class simulator(object):
-    def __init__(self, vertices):
+    def __init__(self):
         # def __init__(self, obj_filePath,vertices):
         """
         Initialize the simulator.
@@ -30,30 +30,13 @@ class simulator(object):
         abs_path = osp.abspath(osp.join(osp.dirname(__file__),'..'))
         data_folder = osp.join(osp.join( abs_path, "calibs","gelsight_mini"))
         self.gelpad_model_path = osp.join(abs_path,"calibs",'gelmap_gsmini_flat.npy')
-        # data_folder =osp.join(osp.abspath(osp.join(osp.dirname(__file__))), "calibs","gelsight_mini")
         
-        # # read in object's ply file
-        # # object facing positive direction of z axis
-        # objPath = osp.join(filePath,obj)
-        # self.obj_name = obj.split('.')[0]
-        # print("load object: " + self.obj_name)
-        # f = open(objPath)
+        self.vertices = np.zeros((1,3))
         
-        # f = open(obj_filePath)
-        # lines = f.readlines()
-        # self.verts_num = int(lines[3].split(' ')[-1])
-        # verts_lines = lines[10:10 + self.verts_num]
-        # self.vertices = np.array([list(map(float, l.strip().split(' '))) for l in verts_lines])
-        
-        # Cancel me 
+        # Load and initialize proper files
         self.heightMap = np.zeros((psp.h,psp.w))
         self.gel_map = np.load(self.gelpad_model_path)
         self.gel_map = cv2.GaussianBlur(self.gel_map.astype(np.float32),(pr.kernel_size,pr.kernel_size),0)
-        # Cancel me 
-        
-        
-        
-        self.vertices = vertices
 
         # polytable
         calib_data = osp.join(data_folder, "polycalib.npz")
@@ -242,16 +225,11 @@ class simulator(object):
         gel_map: gelpad height map
         contact_mask: indicate contact area
         """
-        # gelpad_model_path = osp.join( '..', 'calibs', 'gelmap_gsmini.npy')
+
         assert(self.vertices.shape[1] == 3)
-        # load dome-shape gelpad model
 
         heightMap = np.zeros((psp.h,psp.w))
 
-        # centralize the points
-         # # centralize the points
-        # cx = np.mean(self.vertices[:,0])
-        # cy = np.mean(self.vertices[:,1])
         cx = 0
         cy = 0
         # add the shifting and change to the pix coordinate
