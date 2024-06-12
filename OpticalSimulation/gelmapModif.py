@@ -16,7 +16,9 @@ sys.path.append("..")
 ## in this case is adapted for the gsmini sensor
 ## The original gelmap is 480x640 and the new one is 240x320
 
-if __name__ == "__main__":
+def modify_gelmap():
+    """
+    for gelsightm mini sensor"""
     gelpad_model_path = osp.join( '..', 'calibs', 'gelmap5.npy')
     gelmap = np.load(gelpad_model_path)
     # Visualizzare informazioni sull'array
@@ -33,3 +35,21 @@ if __name__ == "__main__":
     np.save(resized_gel_savePath, gelmap_resized)
 
     print("Resized shape:", gelmap_resized.shape)
+
+    return gelmap_resized
+
+def flat_gelmap():
+    gelpad_model_path = osp.join( '..', 'calibs', 'gelmap_gsmini.npy')
+    gelmap = np.load(gelpad_model_path)
+    mean_value = np.mean(gelmap)
+    gelmap[:] = mean_value
+    
+    resized_gel_savePath = osp.join('..', 'calibs','gelmap_gsmini_flat.npy')
+    np.save(resized_gel_savePath, gelmap)
+
+    return gelmap
+    
+    
+if __name__ == "__main__":
+    flat_gelmap()
+    

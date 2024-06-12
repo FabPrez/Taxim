@@ -29,7 +29,7 @@ class simulator(object):
         """
         abs_path = osp.abspath(osp.join(osp.dirname(__file__),'..'))
         data_folder = osp.join(osp.join( abs_path, "calibs","gelsight_mini"))
-        self.gelpad_model_path = osp.join(abs_path,"calibs",'gelmap_gsmini.npy')
+        self.gelpad_model_path = osp.join(abs_path,"calibs",'gelmap_gsmini_flat.npy')
         # data_folder =osp.join(osp.abspath(osp.join(osp.dirname(__file__))), "calibs","gelsight_mini")
         
         # # read in object's ply file
@@ -44,6 +44,15 @@ class simulator(object):
         # self.verts_num = int(lines[3].split(' ')[-1])
         # verts_lines = lines[10:10 + self.verts_num]
         # self.vertices = np.array([list(map(float, l.strip().split(' '))) for l in verts_lines])
+        
+        # Cancel me 
+        self.heightMap = np.zeros((psp.h,psp.w))
+        self.gel_map = np.load(self.gelpad_model_path)
+        self.gel_map = cv2.GaussianBlur(self.gel_map.astype(np.float32),(pr.kernel_size,pr.kernel_size),0)
+        # Cancel me 
+        
+        
+        
         self.vertices = vertices
 
         # polytable
@@ -236,8 +245,7 @@ class simulator(object):
         # gelpad_model_path = osp.join( '..', 'calibs', 'gelmap_gsmini.npy')
         assert(self.vertices.shape[1] == 3)
         # load dome-shape gelpad model
-        gel_map = np.load(self.gelpad_model_path)
-        gel_map = cv2.GaussianBlur(gel_map.astype(np.float32),(pr.kernel_size,pr.kernel_size),0)
+
         heightMap = np.zeros((psp.h,psp.w))
 
         # centralize the points
@@ -256,32 +264,33 @@ class simulator(object):
         mask_z = self.vertices[:,2] > 0.2
         mask_map = mask_u & mask_v & mask_z
         heightMap[vv[mask_map],uu[mask_map]] = self.vertices[mask_map][:,2]/psp.pixmm
+        self.heightMap = heightMap
 
-        max_g = np.max(gel_map)
-        min_g = np.min(gel_map)
+        max_g = np.max(self.gel_map)
+        min_g = np.min(self.gel_map)
         max_o = np.max(heightMap)
         # pressing depth in pixel
         pressing_height_pix = pressing_height_mm/psp.pixmm
 
         # shift the gelpad to interact with the object
-        gel_map = -1 * gel_map + (max_g+max_o-pressing_height_pix)
+        self.gel_map = -1 * self.gel_map + (max_g+max_o-pressing_height_pix)
 
         # get the contact area
-        contact_mask = heightMap > gel_map
+        contact_mask = heightMap > self.gel_map
 
         # combine contact area of object shape with non contact area of gelpad shape
         zq = np.zeros((psp.h,psp.w))
 
         zq[contact_mask]  = heightMap[contact_mask]
-        zq[~contact_mask] = gel_map[~contact_mask]
-        return zq, gel_map, contact_mask
+        zq[~contact_mask] = self.gel_map[~contact_mask]
+        return zq, self.gel_map, contact_mask
 
     def deformApprox(self, pressing_height_mm, height_map, gel_map, contact_mask):
         zq = height_map.copy()
         zq_back = zq.copy()
         pressing_height_pix = pressing_height_mm/psp.pixmm
         # contact mask which is a little smaller than the real contact mask
-        mask = (zq-(gel_map)) > pressing_height_pix * pr.contact_scale
+        mask = (zq-(self.gel_map)) > pressing_height_pix * pr.contact_scale
         mask = mask & contact_mask
 
         # approximate soft body deformation with pyramid gaussian_filter
@@ -290,7 +299,7 @@ class simulator(object):
             zq[mask] = zq_back[mask]
         zq = cv2.GaussianBlur(zq.astype(np.float32),(pr.kernel_size,pr.kernel_size),0)
 
-        contact_height = zq - gel_map
+        contact_height = zq - self.gel_map
 
         return zq, mask, contact_height
 
@@ -343,9 +352,9 @@ class simulator(object):
     
     def generateSimulatedImages(self, press_depth, dx, dy):
         # generate height map
-        height_map, gel_map, contact_mask = self.generateHeightMap(press_depth, dx, dy)
+        height_map, self.gel_map, contact_mask = self.generateHeightMap(press_depth, dx, dy)
         # approximate the soft deformation
-        heightMap, contact_mask, contact_height = self.deformApprox(press_depth, height_map, gel_map, contact_mask)
+        heightMap, contact_mask, contact_height = self.deformApprox(press_depth, height_map, self.gel_map, contact_mask)
         # simulate tactile images
         sim_img, shadow_sim_img = self.simulating(heightMap, contact_mask, contact_height, shadow=True)
         return sim_img, shadow_sim_img, heightMap
