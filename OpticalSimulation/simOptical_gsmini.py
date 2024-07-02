@@ -10,7 +10,7 @@ import argparse
 
 import sys
 sys.path.append(osp.abspath(osp.join(osp.dirname(__file__),'..')))
-print('path from Taxim is ------: ',sys.path)
+# print('path from Taxim is ------: ',sys.path)
 from Basics.RawData import RawData
 from Basics.CalibData import CalibData
 import Basics.params as pr
